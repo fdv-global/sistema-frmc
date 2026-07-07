@@ -1,0 +1,56 @@
+/**
+ * FRMC — Design Tokens
+ * Fonte única de verdade para cores, tipografia, espaçamento e raio de borda.
+ * Nenhum outro arquivo CSS deve declarar cores/fontes fora daqui.
+ */
+
+:root {
+  /* Cores de marca */
+  --color-primary: #0A4751; /* azul petróleo */
+  --color-primary-hover: #0D5A67;
+  --color-primary-dark: #073036;
+  --color-secondary: #CE9221; /* dourado */
+  --color-secondary-hover: #B87F1A;
+  --color-sand: #DDC79E; /* areia */
+
+  /* Neutros */
+  --color-bg: #F7F5F1;
+  --color-surface: #FFFFFF;
+  --color-border: #E4DFD6;
+  --color-text: #1A1A1A;
+  --color-text-muted: #5C5C5C;
+  --color-text-inverse: #FFFFFF;
+
+  /* Semânticos */
+  --color-success: #2E7D5B;
+  --color-danger: #B3423A;
+  --color-warning: #C98A1C;
+
+  /* Tipografia */
+  --font-family-base: 'Red Hat Display', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-xxl: 36px;
+
+  /* Espaçamento */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  /* Raio e sombra */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(10, 71, 81, 0.08);
+  --shadow-md: 0 4px 16px rgba(10, 71, 81, 0.12);
+
+  /* Transições */
+  --transition-fast: 150ms ease;
+  --transition-base: 220ms ease;
+}
