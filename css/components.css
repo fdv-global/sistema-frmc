@@ -96,3 +96,119 @@
   color: var(--color-danger);
   font-size: var(--font-size-xs);
 }
+
+/* ── App shell (header + nav) ──────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.app-brand {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-inverse);
+}
+.app-nav {
+  display: flex;
+  gap: var(--space-md);
+  flex: 1;
+}
+.nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.nav-link:hover {
+  color: var(--color-text-inverse);
+  background: rgba(255, 255, 255, 0.08);
+}
+.nav-link.active {
+  color: var(--color-text-inverse);
+  background: rgba(255, 255, 255, 0.15);
+}
+.btn-ghost {
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.app-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+}
+
+/* ── Lista de coachees ──────────────────────────────────────────── */
+.coachees-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+.coachee-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.coachee-card:hover {
+  border-color: var(--color-secondary);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+}
+.coachee-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.coachee-avatar--initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-sand);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+}
+.coachee-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.coachee-nome {
+  font-weight: 600;
+  color: var(--color-text);
+}
+.coachee-contato {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: var(--space-xxl) 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}

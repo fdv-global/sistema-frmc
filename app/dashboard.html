@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FRMC — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/tokens.css?v=1">
+  <link rel="stylesheet" href="../css/base.css?v=1">
+  <link rel="stylesheet" href="../css/components.css?v=1">
+</head>
+<body>
+
+  <header class="app-header">
+    <span class="app-brand">FRMC</span>
+    <nav class="app-nav">
+      <a href="dashboard.html" class="nav-link active">Coachees</a>
+      <a href="admin.html" class="nav-link">Admin</a>
+    </nav>
+    <button type="button" class="btn-ghost" id="btn-logout">Sair</button>
+  </header>
+
+  <main class="app-main">
+    <h1>Coachees</h1>
+    <div id="coachees-list" class="coachees-grid" aria-live="polite"></div>
+    <p id="coachees-empty" class="empty-state" hidden>Nenhum coachee vinculado ainda.</p>
+  </main>
+
+  <script src="../js/env-config.js?v=1"></script>
+  <script type="module">
+    import { requireSession, logout } from '../js/auth.js?v=1';
+    import { listCoachees, coacheeInitials } from '../js/coachees.js?v=1';
+
+    const listEl = document.getElementById('coachees-list');
+    const emptyEl = document.getElementById('coachees-empty');
+
+    function renderCoacheeCard(coachee) {
+      const avatar = coachee.foto_url
+        ? `<img class="coachee-avatar" src="${coachee.foto_url}" alt="">`
+        : `<span class="coachee-avatar coachee-avatar--initials">${coacheeInitials(coachee.nome_casual)}</span>`;
+
+      return `
+        <a class="coachee-card" href="coachee.html?id=${coachee.id}">
+          ${avatar}
+          <div class="coachee-info">
+            <span class="coachee-nome">${coachee.nome_casual || 'Sem nome'}</span>
+            ${coachee.email ? `<span class="coachee-contato">${coachee.email}</span>` : ''}
+            ${coachee.whatsapp ? `<span class="coachee-contato">${coachee.whatsapp}</span>` : ''}
+          </div>
+        </a>
+      `;
+    }
+
+    async function init() {
+      await requireSession();
+
+      document.getElementById('btn-logout').addEventListener('click', async () => {
+        await logout();
+        window.location.href = '../index.html';
+      });
+
+      try {
+        const coachees = await listCoachees();
+        if (!coachees.length) {
+          emptyEl.hidden = false;
+        } else {
+          listEl.innerHTML = coachees.map(renderCoacheeCard).join('');
+        }
+      } catch (err) {
+        emptyEl.textContent = 'Erro ao carregar coachees.';
+        emptyEl.hidden = false;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
