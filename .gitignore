@@ -7,9 +7,6 @@
 *.key
 *.pem
 
-# Environment & Secrets (FRMC)
-js/env-config.js
-
 # Dependencies (AIOX)
 node_modules/
 node_modules
