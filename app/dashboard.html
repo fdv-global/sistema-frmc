@@ -36,18 +36,33 @@
     const listEl = document.getElementById('coachees-list');
     const emptyEl = document.getElementById('coachees-empty');
 
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str ?? '';
+      return div.innerHTML;
+    }
+
+    function isSafeImageUrl(url) {
+      try {
+        const parsed = new URL(url, window.location.href);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+      } catch {
+        return false;
+      }
+    }
+
     function renderCoacheeCard(coachee) {
-      const avatar = coachee.foto_url
-        ? `<img class="coachee-avatar" src="${coachee.foto_url}" alt="">`
-        : `<span class="coachee-avatar coachee-avatar--initials">${coacheeInitials(coachee.nome_casual)}</span>`;
+      const avatar = isSafeImageUrl(coachee.foto_url)
+        ? `<img class="coachee-avatar" src="${escapeHtml(coachee.foto_url)}" alt="">`
+        : `<span class="coachee-avatar coachee-avatar--initials">${escapeHtml(coacheeInitials(coachee.nome_casual))}</span>`;
 
       return `
-        <a class="coachee-card" href="coachee.html?id=${coachee.id}">
+        <a class="coachee-card" href="coachee.html?id=${encodeURIComponent(coachee.id)}">
           ${avatar}
           <div class="coachee-info">
-            <span class="coachee-nome">${coachee.nome_casual || 'Sem nome'}</span>
-            ${coachee.email ? `<span class="coachee-contato">${coachee.email}</span>` : ''}
-            ${coachee.whatsapp ? `<span class="coachee-contato">${coachee.whatsapp}</span>` : ''}
+            <span class="coachee-nome">${escapeHtml(coachee.nome_casual) || 'Sem nome'}</span>
+            ${coachee.email ? `<span class="coachee-contato">${escapeHtml(coachee.email)}</span>` : ''}
+            ${coachee.whatsapp ? `<span class="coachee-contato">${escapeHtml(coachee.whatsapp)}</span>` : ''}
           </div>
         </a>
       `;
