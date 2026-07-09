@@ -62,9 +62,11 @@
 
 /* ── Login ──────────────────────────────────────────────────── */
 .login-body {
-  background: var(--color-primary-dark);
+  background-color: var(--color-primary-dark);
 }
 .login-screen {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -74,7 +76,10 @@
 .login-card {
   width: 100%;
   max-width: 380px;
-  background: var(--color-surface);
+  background: rgba(20, 26, 28, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   padding: var(--space-xxl) var(--space-xl);
@@ -82,13 +87,16 @@
 }
 .login-title {
   font-size: var(--font-size-xxl);
-  color: var(--color-primary);
+  color: var(--color-text-inverse);
   margin-bottom: var(--space-xs);
 }
 .login-sub {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.65);
   font-size: var(--font-size-sm);
   margin-bottom: var(--space-xl);
+}
+.login-card .form-label {
+  color: rgba(255, 255, 255, 0.65);
 }
 .login-error {
   margin-top: var(--space-md);
@@ -99,6 +107,8 @@
 
 /* ── App shell (header + nav) ──────────────────────────────────── */
 .app-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--space-lg);
@@ -147,9 +157,15 @@
 }
 
 .app-main {
+  position: relative;
+  z-index: 1;
   max-width: 960px;
   margin: 0 auto;
   padding: var(--space-xl);
+}
+body.bg-frmc .app-main h1,
+body.bg-frmc .empty-state {
+  color: var(--color-text-inverse);
 }
 
 /* ── Lista de coachees ──────────────────────────────────────────── */
@@ -163,16 +179,18 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(20, 26, 28, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  color: var(--color-text);
+  color: var(--color-text-inverse);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .coachee-card:hover {
   border-color: var(--color-secondary);
   box-shadow: var(--shadow-sm);
-  color: var(--color-text);
+  color: var(--color-text-inverse);
 }
 .coachee-avatar {
   width: 44px;
@@ -197,11 +215,11 @@
 }
 .coachee-nome {
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-inverse);
 }
 .coachee-contato {
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.65);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

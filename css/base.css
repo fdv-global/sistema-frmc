@@ -21,9 +21,28 @@ body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-md);
   color: var(--color-text);
-  background: var(--color-bg);
+  background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Fundo de tela (imagem + overlay) ──────────────────────────
+   Aplicado via classe .bg-frmc no <body> de cada página, para
+   permitir rollout controlado tela a tela. */
+body.bg-frmc {
+  background-image: url('../assets/img/fundo-frmc.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body.bg-frmc::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(5, 15, 17, var(--bg-overlay-opacity));
+  pointer-events: none;
 }
 
 h1,
