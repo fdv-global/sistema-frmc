@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/tokens.css?v=1">
+  <link rel="stylesheet" href="../css/tokens.css?v=2">
   <link rel="stylesheet" href="../css/base.css?v=2">
   <link rel="stylesheet" href="../css/components.css?v=2">
 </head>
@@ -96,6 +96,11 @@
                   <span><span class="rv-swatch rv-swatch--desejado"></span> Desejado</span>
                 </div>
               </div>
+
+              <div class="rv-panel rv-classificacao" id="rv-classificacao" hidden>
+                <span class="rv-classificacao-label" id="rv-classificacao-label"></span>
+                <span class="rv-classificacao-media" id="rv-classificacao-media"></span>
+              </div>
             </div>
           </div>
         </div>
@@ -109,8 +114,10 @@
     import { coacheeInitials } from '../js/coachees.js?v=2';
     import {
       AREAS_RODA_VIDA,
+      CLASSIFICACAO_INFO,
       getSessaoComContexto,
       getAvaliacaoRodaVida,
+      salvarAvaliacaoRodaVida,
       isNotaValida,
       renderRadarSvgContent,
     } from '../js/sessoes.js?v=1';
@@ -124,6 +131,9 @@
     const radarEl = document.getElementById('rv-radar');
     const validationMsgEl = document.getElementById('rv-validation-msg');
     const btnSalvar = document.getElementById('btn-salvar-rv');
+    const classificacaoEl = document.getElementById('rv-classificacao');
+    const classificacaoLabelEl = document.getElementById('rv-classificacao-label');
+    const classificacaoMediaEl = document.getElementById('rv-classificacao-media');
 
     function escapeHtml(str) {
       const div = document.createElement('div');
@@ -185,6 +195,18 @@
 
     function atualizarRadar() {
       radarEl.innerHTML = renderRadarSvgContent(lerValores());
+    }
+
+    function exibirClassificacao(avaliacao) {
+      if (!avaliacao || !avaliacao.classificacao) {
+        classificacaoEl.hidden = true;
+        return;
+      }
+      const info = CLASSIFICACAO_INFO[avaliacao.classificacao] || { label: avaliacao.classificacao, color: 'var(--color-text-inverse)' };
+      classificacaoLabelEl.textContent = info.label;
+      classificacaoLabelEl.style.color = info.color;
+      classificacaoMediaEl.textContent = avaliacao.media_atual != null ? `Média atual: ${avaliacao.media_atual}` : '';
+      classificacaoEl.hidden = false;
     }
 
     function preencherFormulario(avaliacao) {
@@ -253,9 +275,10 @@
       if (avaliacaoExistente) {
         preencherFormulario(avaliacaoExistente);
         atualizarRadar();
+        exibirClassificacao(avaliacaoExistente);
       }
 
-      document.getElementById('rv-form').addEventListener('submit', (event) => {
+      document.getElementById('rv-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         const valores = lerValores();
         const valido = validarFormulario(valores);
@@ -265,6 +288,19 @@
           return;
         }
         validationMsgEl.hidden = true;
+
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = 'Salvando…';
+        try {
+          const avaliacaoSalva = await salvarAvaliacaoRodaVida(sessaoId, valores);
+          exibirClassificacao(avaliacaoSalva);
+        } catch (err) {
+          validationMsgEl.textContent = 'Erro ao salvar. Tente novamente.';
+          validationMsgEl.hidden = false;
+        } finally {
+          btnSalvar.disabled = false;
+          btnSalvar.textContent = 'Salvar';
+        }
       });
     }
 

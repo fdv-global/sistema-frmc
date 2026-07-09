@@ -87,6 +87,13 @@ export async function getAvaliacaoRodaVida(sessaoId) {
   return data;
 }
 
+export const CLASSIFICACAO_INFO = {
+  plenitude: { label: 'Plenitude', color: 'var(--color-mint)' },
+  bom: { label: 'Bom', color: 'var(--color-bom)' },
+  critico: { label: 'Crítico', color: 'var(--color-warning)' },
+  muito_critico: { label: 'Muito crítico', color: 'var(--color-alerta-suave)' },
+};
+
 export function isNotaValida(valor) {
   return Number.isInteger(valor) && valor >= 0 && valor <= 10;
 }
@@ -161,4 +168,25 @@ export function renderRadarSvgContent(valores) {
   const poligonoAtual = poligono('atual', 'rv-radar-atual', RADAR_COR_ATUAL_FILL, RADAR_COR_ATUAL_STROKE);
 
   return `${grades}${eixos}${poligonoDesejado}${poligonoAtual}${labels}`;
+}
+
+/**
+ * Grava os 22 valores em avaliacoes_roda_vida (upsert por sessao_id —
+ * unique constraint já garante 1 avaliação por sessão). media_atual e
+ * classificacao voltam calculados pelo banco na linha retornada.
+ */
+export async function salvarAvaliacaoRodaVida(sessaoId, valores) {
+  const payload = { sessao_id: sessaoId };
+  for (const { key } of AREAS_RODA_VIDA) {
+    payload[`atual_${key}`] = valores[key].atual;
+    payload[`desejado_${key}`] = valores[key].desejado;
+  }
+
+  const { data, error } = await supabase
+    .from('avaliacoes_roda_vida')
+    .upsert(payload, { onConflict: 'sessao_id' })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 }

@@ -671,3 +671,22 @@ body.bg-frmc .session-header h1 {
 .rv-swatch--desejado {
   background: var(--color-secondary);
 }
+
+/* ── Roda da Vida: classificação ────────────────────────────────── */
+.rv-classificacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.rv-classificacao[hidden] {
+  display: none;
+}
+.rv-classificacao-label {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+}
+.rv-classificacao-media {
+  color: var(--color-text-inverse-muted);
+  font-size: var(--font-size-sm);
+}

@@ -26,6 +26,8 @@
   --color-danger: #B3423A;
   --color-warning: #C98A1C;
   --color-mint: #5DCAA5; /* progresso Roda da Vida / ciclo ativo */
+  --color-bom: #3E8C7A; /* classificacao "bom" da Roda da Vida */
+  --color-alerta-suave: #C97355; /* classificacao "muito_critico" — sem vermelho agressivo */
 
   /* Texto sobre glass/fundo de tela */
   --color-text-inverse-muted: rgba(255, 255, 255, 0.65);
