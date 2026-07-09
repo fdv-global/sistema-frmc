@@ -82,6 +82,7 @@
               <div class="rv-rows" id="rv-rows"></div>
               <div class="rv-actions">
                 <button type="submit" class="btn-primary" id="btn-salvar-rv">Salvar</button>
+                <button type="button" class="btn-ghost" id="btn-exportar-pdf" disabled>Exportar PDF</button>
                 <span class="rv-validation-msg" id="rv-validation-msg" hidden></span>
               </div>
             </form>
@@ -121,6 +122,7 @@
       isNotaValida,
       renderRadarSvgContent,
     } from '../js/sessoes.js?v=1';
+    import { exportarRodaVidaPdf } from '../js/roda-vida-pdf.js?v=1';
 
     const params = new URLSearchParams(window.location.search);
     const sessaoId = params.get('sessao_id');
@@ -131,9 +133,12 @@
     const radarEl = document.getElementById('rv-radar');
     const validationMsgEl = document.getElementById('rv-validation-msg');
     const btnSalvar = document.getElementById('btn-salvar-rv');
+    const btnExportar = document.getElementById('btn-exportar-pdf');
     const classificacaoEl = document.getElementById('rv-classificacao');
     const classificacaoLabelEl = document.getElementById('rv-classificacao-label');
     const classificacaoMediaEl = document.getElementById('rv-classificacao-media');
+
+    let ultimaAvaliacaoSalva = null;
 
     function escapeHtml(str) {
       const div = document.createElement('div');
@@ -200,6 +205,7 @@
     function exibirClassificacao(avaliacao) {
       if (!avaliacao || !avaliacao.classificacao) {
         classificacaoEl.hidden = true;
+        btnExportar.disabled = true;
         return;
       }
       const info = CLASSIFICACAO_INFO[avaliacao.classificacao] || { label: avaliacao.classificacao, color: 'var(--color-text-inverse)' };
@@ -207,6 +213,7 @@
       classificacaoLabelEl.style.color = info.color;
       classificacaoMediaEl.textContent = avaliacao.media_atual != null ? `Média atual: ${avaliacao.media_atual}` : '';
       classificacaoEl.hidden = false;
+      btnExportar.disabled = false;
     }
 
     function preencherFormulario(avaliacao) {
@@ -275,6 +282,7 @@
       if (avaliacaoExistente) {
         preencherFormulario(avaliacaoExistente);
         atualizarRadar();
+        ultimaAvaliacaoSalva = avaliacaoExistente;
         exibirClassificacao(avaliacaoExistente);
       }
 
@@ -293,6 +301,7 @@
         btnSalvar.textContent = 'Salvando…';
         try {
           const avaliacaoSalva = await salvarAvaliacaoRodaVida(sessaoId, valores);
+          ultimaAvaliacaoSalva = avaliacaoSalva;
           exibirClassificacao(avaliacaoSalva);
         } catch (err) {
           validationMsgEl.textContent = 'Erro ao salvar. Tente novamente.';
@@ -300,6 +309,25 @@
         } finally {
           btnSalvar.disabled = false;
           btnSalvar.textContent = 'Salvar';
+        }
+      });
+
+      btnExportar.addEventListener('click', async () => {
+        if (!ultimaAvaliacaoSalva) return;
+        btnExportar.disabled = true;
+        btnExportar.textContent = 'Gerando…';
+        try {
+          await exportarRodaVidaPdf({
+            coacheeNome: coachee?.nome_casual || 'Coachee',
+            sessaoData: formatarData(sessao.data),
+            valores: lerValores(),
+            media: ultimaAvaliacaoSalva.media_atual,
+            classificacao: ultimaAvaliacaoSalva.classificacao,
+            radarEl,
+          });
+        } finally {
+          btnExportar.disabled = false;
+          btnExportar.textContent = 'Exportar PDF';
         }
       });
     }

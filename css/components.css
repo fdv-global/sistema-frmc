@@ -603,7 +603,8 @@ body.bg-frmc .session-header h1 {
   gap: var(--space-md);
   margin-top: var(--space-lg);
 }
-.rv-actions .btn-primary {
+.rv-actions .btn-primary,
+.rv-actions .btn-ghost {
   width: auto;
 }
 .rv-validation-msg {
