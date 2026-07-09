@@ -77,13 +77,27 @@
         <p id="session-error" class="empty-state" hidden></p>
 
         <div id="rv-content" hidden>
-          <form class="rv-panel rv-form" id="rv-form" novalidate>
-            <div class="rv-rows" id="rv-rows"></div>
-            <div class="rv-actions">
-              <button type="submit" class="btn-primary" id="btn-salvar-rv">Salvar</button>
-              <span class="rv-validation-msg" id="rv-validation-msg" hidden></span>
+          <div class="rv-layout">
+            <form class="rv-panel rv-form" id="rv-form" novalidate>
+              <div class="rv-rows" id="rv-rows"></div>
+              <div class="rv-actions">
+                <button type="submit" class="btn-primary" id="btn-salvar-rv">Salvar</button>
+                <span class="rv-validation-msg" id="rv-validation-msg" hidden></span>
+              </div>
+            </form>
+
+            <div class="rv-side">
+              <div class="rv-panel">
+                <div class="rv-radar-wrap">
+                  <svg id="rv-radar" class="rv-radar" viewBox="-60 -20 440 360"></svg>
+                </div>
+                <div class="rv-radar-legend">
+                  <span><span class="rv-swatch rv-swatch--atual"></span> Atual</span>
+                  <span><span class="rv-swatch rv-swatch--desejado"></span> Desejado</span>
+                </div>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       </main>
     </div>
@@ -98,6 +112,7 @@
       getSessaoComContexto,
       getAvaliacaoRodaVida,
       isNotaValida,
+      renderRadarSvgContent,
     } from '../js/sessoes.js?v=1';
 
     const params = new URLSearchParams(window.location.search);
@@ -106,6 +121,7 @@
     const rowsEl = document.getElementById('rv-rows');
     const contentEl = document.getElementById('rv-content');
     const errorEl = document.getElementById('session-error');
+    const radarEl = document.getElementById('rv-radar');
     const validationMsgEl = document.getElementById('rv-validation-msg');
     const btnSalvar = document.getElementById('btn-salvar-rv');
 
@@ -167,6 +183,10 @@
       return valido;
     }
 
+    function atualizarRadar() {
+      radarEl.innerHTML = renderRadarSvgContent(lerValores());
+    }
+
     function preencherFormulario(avaliacao) {
       if (!avaliacao) return;
       for (const { key } of AREAS_RODA_VIDA) {
@@ -198,6 +218,11 @@
       }
 
       montarLinhasFormulario();
+      atualizarRadar();
+
+      rowsEl.addEventListener('input', () => {
+        atualizarRadar();
+      });
 
       let sessao;
       try {
@@ -227,6 +252,7 @@
       const avaliacaoExistente = await getAvaliacaoRodaVida(sessaoId).catch(() => null);
       if (avaliacaoExistente) {
         preencherFormulario(avaliacaoExistente);
+        atualizarRadar();
       }
 
       document.getElementById('rv-form').addEventListener('submit', (event) => {

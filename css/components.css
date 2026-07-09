@@ -511,6 +511,21 @@ body.bg-frmc .session-header h1 {
   margin: 0;
 }
 
+/* ── Roda da Vida: layout ───────────────────────────────────────── */
+.rv-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+.rv-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  position: sticky;
+  top: var(--space-xl);
+}
+
 /* ── Roda da Vida: formulário ───────────────────────────────────── */
 .rv-rows {
   display: flex;
@@ -594,4 +609,65 @@ body.bg-frmc .session-header h1 {
 .rv-validation-msg {
   color: var(--color-danger);
   font-size: var(--font-size-xs);
+}
+
+/* ── Roda da Vida: radar ────────────────────────────────────────── */
+.rv-radar-wrap {
+  display: flex;
+  justify-content: center;
+}
+.rv-radar {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
+.rv-radar-grid {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+}
+.rv-radar-axis {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+}
+.rv-radar-label {
+  fill: var(--color-text-inverse-muted);
+  font-family: var(--font-family-base);
+  font-size: 10px;
+}
+.rv-radar-atual {
+  fill: rgba(10, 71, 81, 0.45);
+  stroke: var(--color-primary-hover);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.rv-radar-desejado {
+  fill: rgba(206, 146, 33, 0.25);
+  stroke: var(--color-secondary);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.rv-radar-legend {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-inverse-muted);
+}
+.rv-radar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.rv-radar-legend .rv-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.rv-swatch--atual {
+  background: var(--color-primary-hover);
+}
+.rv-swatch--desejado {
+  background: var(--color-secondary);
 }

@@ -90,3 +90,75 @@ export async function getAvaliacaoRodaVida(sessaoId) {
 export function isNotaValida(valor) {
   return Number.isInteger(valor) && valor >= 0 && valor <= 10;
 }
+
+/**
+ * Radar SVG (11 eixos). Recalculado no client a partir dos valores dos
+ * inputs — não depende de salvar antes.
+ */
+const RADAR_SIZE = 320;
+const RADAR_CENTER = RADAR_SIZE / 2;
+const RADAR_MAX_R = 118;
+const RADAR_LABEL_R = RADAR_MAX_R + 26;
+const RADAR_ANEIS = [2, 4, 6, 8, 10];
+
+function pontoRadar(indice, total, raio) {
+  const angulo = (Math.PI * 2 * indice) / total - Math.PI / 2;
+  return {
+    x: RADAR_CENTER + raio * Math.cos(angulo),
+    y: RADAR_CENTER + raio * Math.sin(angulo),
+  };
+}
+
+/**
+ * As cores abaixo duplicam os tokens de css/tokens.css como valores literais
+ * (não var(...)) de propósito: quando o SVG é exportado pro PDF, ele é
+ * serializado sozinho (sem acesso a components.css nem às custom properties
+ * do documento), então precisa se sustentar sozinho com atributos inline.
+ * As classes CSS (rv-radar-*) continuam sendo a fonte de verdade pra tela;
+ * isto aqui é só o fallback pro rasterizador.
+ */
+const RADAR_COR_GRADE = 'rgba(255,255,255,0.12)';
+const RADAR_COR_LABEL = 'rgba(255,255,255,0.65)';
+const RADAR_COR_ATUAL_FILL = 'rgba(10,71,81,0.45)';
+const RADAR_COR_ATUAL_STROKE = '#0D5A67';
+const RADAR_COR_DESEJADO_FILL = 'rgba(206,146,33,0.25)';
+const RADAR_COR_DESEJADO_STROKE = '#CE9221';
+
+export function renderRadarSvgContent(valores) {
+  const total = AREAS_RODA_VIDA.length;
+
+  const grades = RADAR_ANEIS.map((nivel) => {
+    const raio = (nivel / 10) * RADAR_MAX_R;
+    const pontos = AREAS_RODA_VIDA.map((_, i) => {
+      const p = pontoRadar(i, total, raio);
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }).join(' ');
+    return `<polygon class="rv-radar-grid" points="${pontos}" fill="none" stroke="${RADAR_COR_GRADE}" stroke-width="1"/>`;
+  }).join('');
+
+  const eixos = AREAS_RODA_VIDA.map((_, i) => {
+    const p = pontoRadar(i, total, RADAR_MAX_R);
+    return `<line class="rv-radar-axis" x1="${RADAR_CENTER}" y1="${RADAR_CENTER}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="${RADAR_COR_GRADE}" stroke-width="1"/>`;
+  }).join('');
+
+  const labels = AREAS_RODA_VIDA.map((area, i) => {
+    const p = pontoRadar(i, total, RADAR_LABEL_R);
+    const anchor = p.x < RADAR_CENTER - 8 ? 'end' : p.x > RADAR_CENTER + 8 ? 'start' : 'middle';
+    return `<text class="rv-radar-label" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" fill="${RADAR_COR_LABEL}" font-size="10">${area.label}</text>`;
+  }).join('');
+
+  const poligono = (campo, cls, fill, stroke) => {
+    const pontos = AREAS_RODA_VIDA.map((area, i) => {
+      const valor = valores?.[area.key]?.[campo];
+      const raio = (Math.max(0, Math.min(10, valor ?? 0)) / 10) * RADAR_MAX_R;
+      const p = pontoRadar(i, total, raio);
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }).join(' ');
+    return `<polygon class="${cls}" points="${pontos}" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>`;
+  };
+
+  const poligonoDesejado = poligono('desejado', 'rv-radar-desejado', RADAR_COR_DESEJADO_FILL, RADAR_COR_DESEJADO_STROKE);
+  const poligonoAtual = poligono('atual', 'rv-radar-atual', RADAR_COR_ATUAL_FILL, RADAR_COR_ATUAL_STROKE);
+
+  return `${grades}${eixos}${poligonoDesejado}${poligonoAtual}${labels}`;
+}
