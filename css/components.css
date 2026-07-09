@@ -342,9 +342,9 @@ body.bg-frmc .empty-state {
 }
 .coachee-card {
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md);
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: 18px;
   background: rgba(20, 26, 28, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -357,6 +357,18 @@ body.bg-frmc .empty-state {
   border-color: var(--color-secondary);
   box-shadow: var(--shadow-sm);
   color: var(--color-text-inverse);
+}
+.coachee-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.coachee-card-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
 }
 .coachee-avatar {
   width: 44px;
@@ -389,6 +401,75 @@ body.bg-frmc .empty-state {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Anel de progresso (média Roda da Vida) ────────────────────── */
+.coachee-progress {
+  flex-shrink: 0;
+}
+.progress-ring-track {
+  stroke: rgba(255, 255, 255, 0.14);
+}
+.progress-ring-fill {
+  stroke: var(--color-mint);
+}
+.progress-ring-track--empty {
+  stroke: rgba(255, 255, 255, 0.18);
+}
+.progress-ring-dash {
+  stroke: rgba(255, 255, 255, 0.4);
+}
+.progress-ring-value {
+  fill: var(--color-text-inverse);
+  font-family: var(--font-family-base);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Badges de ciclo ────────────────────────────────────────────── */
+.coachee-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge--success {
+  background: rgba(93, 202, 165, 0.18);
+  border: 1px solid rgba(93, 202, 165, 0.35);
+  color: var(--color-mint);
+}
+.badge--gold {
+  background: rgba(206, 146, 33, 0.18);
+  border: 1px solid rgba(206, 146, 33, 0.35);
+  color: var(--color-secondary);
+}
+.badge--neutral {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--color-text-inverse-muted);
+}
+
+/* ── Rodapé do card ─────────────────────────────────────────────── */
+.coachee-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-inverse-muted);
+}
+.coachee-trend {
+  font-weight: 700;
 }
 
 .empty-state {

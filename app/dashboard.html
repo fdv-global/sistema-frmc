@@ -78,7 +78,7 @@
   <script src="../js/env-config.js?v=1"></script>
   <script type="module">
     import { requireSession, logout } from '../js/auth.js?v=1';
-    import { listCoachees, coacheeInitials } from '../js/coachees.js?v=1';
+    import { listCoachees, coacheeInitials, renderProgressRing, renderCicloBadges } from '../js/coachees.js?v=1';
 
     const listEl = document.getElementById('coachees-list');
     const emptyEl = document.getElementById('coachees-empty');
@@ -103,13 +103,30 @@
         ? `<img class="coachee-avatar" src="${escapeHtml(coachee.foto_url)}" alt="">`
         : `<span class="coachee-avatar coachee-avatar--initials">${escapeHtml(coacheeInitials(coachee.nome_casual))}</span>`;
 
+      // Ciclo, Roda da Vida e sessões ainda não têm dado real (Blocos B/C) —
+      // card renderiza os estados vazios até esses blocos entregarem dado.
+      const ciclo = null;
+      const mediaRodaDaVida = null;
+      const ultimaSessaoRelativa = '—';
+      const tendencia = '—';
+
       return `
         <a class="coachee-card" href="coachee.html?id=${encodeURIComponent(coachee.id)}">
-          ${avatar}
-          <div class="coachee-info">
-            <span class="coachee-nome">${escapeHtml(coachee.nome_casual) || 'Sem nome'}</span>
-            ${coachee.email ? `<span class="coachee-contato">${escapeHtml(coachee.email)}</span>` : ''}
-            ${coachee.whatsapp ? `<span class="coachee-contato">${escapeHtml(coachee.whatsapp)}</span>` : ''}
+          <div class="coachee-card-header">
+            <div class="coachee-card-identity">
+              ${avatar}
+              <div class="coachee-info">
+                <span class="coachee-nome">${escapeHtml(coachee.nome_casual) || 'Sem nome'}</span>
+                ${coachee.email ? `<span class="coachee-contato">${escapeHtml(coachee.email)}</span>` : ''}
+                ${coachee.whatsapp ? `<span class="coachee-contato">${escapeHtml(coachee.whatsapp)}</span>` : ''}
+              </div>
+            </div>
+            <div class="coachee-progress">${renderProgressRing(mediaRodaDaVida)}</div>
+          </div>
+          <div class="coachee-badges">${renderCicloBadges(ciclo)}</div>
+          <div class="coachee-footer">
+            <span>Última sessão: ${ultimaSessaoRelativa}</span>
+            <span class="coachee-trend" aria-label="Tendência da Roda da Vida">${tendencia}</span>
           </div>
         </a>
       `;
