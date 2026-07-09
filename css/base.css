@@ -14,7 +14,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -32,9 +32,8 @@ body {
 body.bg-frmc {
   background-image: url('../assets/img/fundo-frmc.png');
   background-size: cover;
-  background-position: center;
+  background-position: top center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 body.bg-frmc::before {
   content: '';
