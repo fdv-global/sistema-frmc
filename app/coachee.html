@@ -9,22 +9,330 @@
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/tokens.css?v=2">
   <link rel="stylesheet" href="../css/base.css?v=2">
-  <link rel="stylesheet" href="../css/components.css?v=3">
+  <link rel="stylesheet" href="../css/components.css?v=4">
 </head>
 <body class="bg-frmc">
 
-  <header class="app-header">
-    <span class="app-brand">FRMC</span>
-    <nav class="app-nav">
-      <a href="dashboard.html" class="nav-link active">Coachees</a>
-      <a href="admin.html" class="nav-link">Admin</a>
-    </nav>
-    <button type="button" class="btn-ghost" id="btn-logout">Sair</button>
-  </header>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="dashboard.html" class="app-brand"><img src="../assets/img/logo-frmc-sigla.png" alt="FRMC"></a>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="pill-nav active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+            <circle cx="10" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Coachees</span>
+        </a>
+        <a href="admin.html" class="pill-nav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Admin</span>
+        </a>
+      </nav>
+      <button type="button" class="pill-nav pill-nav--logout" id="btn-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Sair</span>
+      </button>
+    </aside>
 
-  <main class="app-main">
-    <!-- TODO Bloco B: perfil do coachee, ciclos e sessões (ciclos.js, sessoes.js) -->
-  </main>
+    <div class="app-content">
+      <header class="topbar">
+        <div class="search-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <span class="search-placeholder">Buscar coachee…</span>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="icon-pill" aria-label="Notificações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
+          <div class="user-pill">
+            <span class="user-avatar" id="user-avatar">--</span>
+            <span class="user-name" id="user-name">Coach</span>
+          </div>
+        </div>
+      </header>
 
+      <main class="app-main">
+        <a href="dashboard.html" class="session-back">← Coachees</a>
+
+        <p id="coachee-error" class="empty-state" hidden></p>
+
+        <div id="coachee-content" hidden>
+          <div id="coachee-perfil"></div>
+
+          <div class="section-header">
+            <h2>Ciclos</h2>
+            <button type="button" class="btn-primary" id="btn-novo-ciclo">+ Novo Ciclo</button>
+          </div>
+
+          <div class="inline-form" id="form-novo-ciclo" hidden>
+            <select id="select-tipo-ciclo" class="form-ctrl">
+              <option value="experimental">Experimental</option>
+              <option value="completo">Completo</option>
+            </select>
+            <button type="button" class="btn-primary" id="btn-confirmar-ciclo">Confirmar</button>
+            <button type="button" class="btn-ghost" id="btn-cancelar-ciclo">Cancelar</button>
+          </div>
+
+          <span class="rv-validation-msg" id="ciclos-msg" hidden></span>
+
+          <div id="ciclos-list" class="ciclos-list"></div>
+
+          <div class="empty-state-block" id="ciclos-empty" hidden>
+            <p>Este coachee ainda não tem nenhum ciclo.</p>
+            <button type="button" class="btn-primary" id="btn-primeiro-ciclo">Criar primeiro ciclo</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/env-config.js?v=2"></script>
+  <script type="module">
+    import { requireSession, logout } from '../js/auth.js?v=2';
+    import { coacheeInitials, renderCicloBadges } from '../js/coachees.js?v=2';
+    import { getCoacheeComCiclos, criarCiclo, criarSessao, renderSessaoStatusBadge } from '../js/ciclos.js?v=1';
+
+    const params = new URLSearchParams(window.location.search);
+    const coacheeId = params.get('id');
+
+    const errorEl = document.getElementById('coachee-error');
+    const contentEl = document.getElementById('coachee-content');
+    const perfilEl = document.getElementById('coachee-perfil');
+    const ciclosListEl = document.getElementById('ciclos-list');
+    const ciclosEmptyEl = document.getElementById('ciclos-empty');
+    const ciclosMsgEl = document.getElementById('ciclos-msg');
+    const formNovoCicloEl = document.getElementById('form-novo-ciclo');
+    const selectTipoCicloEl = document.getElementById('select-tipo-ciclo');
+    const btnNovoCiclo = document.getElementById('btn-novo-ciclo');
+    const btnPrimeiroCiclo = document.getElementById('btn-primeiro-ciclo');
+    const btnConfirmarCiclo = document.getElementById('btn-confirmar-ciclo');
+    const btnCancelarCiclo = document.getElementById('btn-cancelar-ciclo');
+
+    let coacheeAtual = null;
+    const ciclosAbertos = new Set();
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str ?? '';
+      return div.innerHTML;
+    }
+
+    function isSafeImageUrl(url) {
+      try {
+        const parsed = new URL(url, window.location.href);
+        return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+      } catch {
+        return false;
+      }
+    }
+
+    function formatarData(valor) {
+      if (!valor) return '—';
+      const d = new Date(valor);
+      if (Number.isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('pt-BR');
+    }
+
+    function renderPerfil(coachee) {
+      const avatar = isSafeImageUrl(coachee.foto_url)
+        ? `<img class="coachee-avatar coachee-avatar--lg" src="${escapeHtml(coachee.foto_url)}" alt="">`
+        : `<span class="coachee-avatar coachee-avatar--lg coachee-avatar--initials">${escapeHtml(coacheeInitials(coachee.nome_casual))}</span>`;
+
+      const contatos = [coachee.email, coachee.whatsapp]
+        .filter(Boolean)
+        .map((c) => `<span>${escapeHtml(c)}</span>`)
+        .join('');
+
+      perfilEl.innerHTML = `
+        <div class="coachee-profile">
+          ${avatar}
+          <div class="coachee-profile-info">
+            <span class="coachee-profile-nome">${escapeHtml(coachee.nome_casual) || 'Sem nome'}</span>
+            <div class="coachee-profile-contatos">${contatos}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSessaoRow(sessao) {
+      return `
+        <a class="sessao-row" href="sessao.html?sessao_id=${encodeURIComponent(sessao.id)}">
+          <span class="sessao-numero">#${sessao.numero}</span>
+          <span class="sessao-data">${formatarData(sessao.data)}</span>
+          ${renderSessaoStatusBadge(sessao.status)}
+        </a>
+      `;
+    }
+
+    function renderCiclo(ciclo) {
+      const sessoesOrdenadas = [...(ciclo.sessoes || [])].sort((a, b) => a.numero - b.numero);
+      const isOpen = ciclosAbertos.has(ciclo.id);
+
+      const sessoesHtml = sessoesOrdenadas.length
+        ? `
+          <div class="sessoes-list">${sessoesOrdenadas.map(renderSessaoRow).join('')}</div>
+          <button type="button" class="btn-ghost btn-nova-sessao" data-ciclo-id="${ciclo.id}">+ Nova Sessão</button>
+        `
+        : `
+          <div class="empty-state-block">
+            <p>Nenhuma sessão criada ainda neste ciclo.</p>
+            <button type="button" class="btn-primary btn-nova-sessao" data-ciclo-id="${ciclo.id}">Criar primeira sessão</button>
+          </div>
+        `;
+
+      return `
+        <details class="ciclo-card" data-ciclo-id="${ciclo.id}" ${isOpen ? 'open' : ''}>
+          <summary class="ciclo-summary">
+            ${renderCicloBadges(ciclo)}
+            <span class="ciclo-data-inicio">Início: ${formatarData(ciclo.data_inicio)}</span>
+            <svg class="ciclo-summary-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </summary>
+          <div class="ciclo-body">${sessoesHtml}</div>
+        </details>
+      `;
+    }
+
+    function attachCicloToggleListeners() {
+      ciclosListEl.querySelectorAll('details.ciclo-card').forEach((el) => {
+        el.addEventListener('toggle', () => {
+          const id = el.dataset.cicloId;
+          if (el.open) ciclosAbertos.add(id);
+          else ciclosAbertos.delete(id);
+        });
+      });
+    }
+
+    function renderCiclos() {
+      const ciclos = coacheeAtual.ciclos || [];
+      if (!ciclos.length) {
+        ciclosListEl.innerHTML = '';
+        ciclosEmptyEl.hidden = false;
+        return;
+      }
+      ciclosEmptyEl.hidden = true;
+      const ordenados = [...ciclos].sort((a, b) => new Date(b.data_inicio) - new Date(a.data_inicio));
+      ciclosListEl.innerHTML = ordenados.map(renderCiclo).join('');
+      attachCicloToggleListeners();
+    }
+
+    function abrirFormNovoCiclo() {
+      formNovoCicloEl.hidden = false;
+      ciclosMsgEl.hidden = true;
+    }
+
+    function fecharFormNovoCiclo() {
+      formNovoCicloEl.hidden = true;
+      selectTipoCicloEl.value = 'experimental';
+    }
+
+    async function handleNovoCiclo() {
+      const tipo = selectTipoCicloEl.value;
+      btnConfirmarCiclo.disabled = true;
+      btnConfirmarCiclo.textContent = 'Criando…';
+      ciclosMsgEl.hidden = true;
+      try {
+        const novoCiclo = await criarCiclo(coacheeAtual.id, tipo);
+        coacheeAtual.ciclos = [...(coacheeAtual.ciclos || []), { ...novoCiclo, sessoes: [] }];
+        ciclosAbertos.add(novoCiclo.id);
+        fecharFormNovoCiclo();
+        renderCiclos();
+      } catch (err) {
+        ciclosMsgEl.textContent = 'Erro ao criar ciclo. Tente novamente.';
+        ciclosMsgEl.hidden = false;
+      } finally {
+        btnConfirmarCiclo.disabled = false;
+        btnConfirmarCiclo.textContent = 'Confirmar';
+      }
+    }
+
+    async function handleNovaSessao(botao) {
+      const cicloId = botao.dataset.cicloId;
+      const ciclo = (coacheeAtual.ciclos || []).find((c) => c.id === cicloId);
+      if (!ciclo) return;
+
+      const textoOriginal = botao.textContent;
+      botao.disabled = true;
+      botao.textContent = 'Criando…';
+      ciclosMsgEl.hidden = true;
+      try {
+        const novaSessao = await criarSessao(cicloId, ciclo.sessoes || []);
+        ciclo.sessoes = [...(ciclo.sessoes || []), novaSessao];
+        ciclosAbertos.add(cicloId);
+        renderCiclos();
+      } catch (err) {
+        ciclosMsgEl.textContent = 'Erro ao criar sessão. Tente novamente.';
+        ciclosMsgEl.hidden = false;
+        botao.disabled = false;
+        botao.textContent = textoOriginal;
+      }
+    }
+
+    async function init() {
+      const session = await requireSession();
+      if (!session) return;
+
+      const email = session.user?.email ?? '';
+      document.getElementById('user-name').textContent = email || 'Coach';
+      document.getElementById('user-avatar').textContent = coacheeInitials(email.split('@')[0].replace(/[._-]+/g, ' '));
+
+      document.getElementById('btn-logout').addEventListener('click', async () => {
+        await logout();
+        window.location.href = '../index.html';
+      });
+
+      if (!coacheeId) {
+        errorEl.textContent = 'Nenhum coachee informado na URL (?id=).';
+        errorEl.hidden = false;
+        return;
+      }
+
+      try {
+        coacheeAtual = await getCoacheeComCiclos(coacheeId);
+      } catch (err) {
+        errorEl.textContent = 'Não foi possível carregar os dados deste coachee.';
+        errorEl.hidden = false;
+        return;
+      }
+
+      if (!coacheeAtual) {
+        errorEl.textContent = 'Nenhum coachee corresponde a este link.';
+        errorEl.hidden = false;
+        return;
+      }
+
+      contentEl.hidden = false;
+      renderPerfil(coacheeAtual);
+      renderCiclos();
+
+      btnNovoCiclo.addEventListener('click', abrirFormNovoCiclo);
+      btnPrimeiroCiclo.addEventListener('click', abrirFormNovoCiclo);
+      btnCancelarCiclo.addEventListener('click', fecharFormNovoCiclo);
+      btnConfirmarCiclo.addEventListener('click', handleNovoCiclo);
+
+      ciclosListEl.addEventListener('click', (event) => {
+        const botao = event.target.closest('.btn-nova-sessao');
+        if (!botao) return;
+        handleNovaSessao(botao);
+      });
+    }
+
+    init();
+  </script>
 </body>
 </html>
