@@ -48,10 +48,7 @@
 .form-ctrl {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  color: var(--color-text);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .form-ctrl:focus {
@@ -123,7 +120,7 @@
 }
 .app-brand img {
   display: block;
-  height: 30px;
+  height: 46px;
   width: auto;
 }
 .app-nav {
@@ -193,7 +190,7 @@ body.bg-frmc .empty-state {
 }
 .sidebar .app-brand {
   padding: 0 var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 .sidebar-nav {
   display: flex;
@@ -637,10 +634,7 @@ body.bg-frmc .section-header h2 {
 .inline-form select {
   color-scheme: dark;
   padding: var(--space-xs) var(--space-sm);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-sm);
-  color: var(--color-text-inverse);
 }
 .inline-form select:focus {
   outline: none;
@@ -755,10 +749,7 @@ body.bg-frmc .session-header h1 {
 .rv-input {
   width: 100%;
   padding: var(--space-xs) var(--space-sm);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  color: var(--color-text);
   text-align: center;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }

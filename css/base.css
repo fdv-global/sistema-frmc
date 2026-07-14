@@ -80,6 +80,19 @@ select,
 textarea {
   font-family: inherit;
   font-size: var(--font-size-sm);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  color: var(--color-text-inverse);
+}
+
+/* A lista aberta de um <select> nativo não é 100% estilizável via CSS
+   (fora do controle do autor da página, varia por navegador/SO) — isto
+   aqui é o alcance parcial possível. Dropdown customizado (componente
+   reaproveitável) fica registrado como item de backlog, não bloqueia
+   o Bloco B. */
+select option {
+  background: var(--color-primary-dark);
+  color: var(--color-text-inverse);
 }
 
 img {
