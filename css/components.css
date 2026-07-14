@@ -626,13 +626,26 @@ body.bg-frmc .section-header h2 {
   gap: var(--space-sm);
   flex-wrap: wrap;
   margin-top: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(20, 26, 28, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
 }
 .inline-form select {
+  color-scheme: dark;
   padding: var(--space-xs) var(--space-sm);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-sm);
-  color: var(--color-text);
+  color: var(--color-text-inverse);
+}
+.inline-form select:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(206, 146, 33, 0.15);
 }
 .inline-form .btn-primary,
 .inline-form .btn-ghost {
