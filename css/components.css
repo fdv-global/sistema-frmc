@@ -85,10 +85,11 @@
   padding: var(--space-xxl) var(--space-xl);
   text-align: center;
 }
-.login-title {
-  font-size: var(--font-size-xxl);
-  color: var(--color-text-inverse);
-  margin-bottom: var(--space-xs);
+.login-logo {
+  display: block;
+  height: 36px;
+  width: auto;
+  margin: 0 auto var(--space-xs);
 }
 .login-sub {
   color: var(--color-text-inverse-muted);
@@ -117,9 +118,13 @@
   color: var(--color-text-inverse);
 }
 .app-brand {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-text-inverse);
+  display: inline-flex;
+  align-items: center;
+}
+.app-brand img {
+  display: block;
+  height: 30px;
+  width: auto;
 }
 .app-nav {
   display: flex;
