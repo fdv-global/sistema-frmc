@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/tokens.css?v=2">
   <link rel="stylesheet" href="../css/base.css?v=2">
-  <link rel="stylesheet" href="../css/components.css?v=2">
+  <link rel="stylesheet" href="../css/components.css?v=3">
 </head>
 <body class="bg-frmc">
 
@@ -77,15 +77,63 @@
         <p id="session-error" class="empty-state" hidden></p>
 
         <div id="rv-content" hidden>
+          <div class="rv-mode-toggle" role="tablist">
+            <button type="button" class="rv-mode-btn is-active" data-mode="grade" role="tab" aria-selected="true">Resposta Rápida</button>
+            <button type="button" class="rv-mode-btn" data-mode="quiz" role="tab" aria-selected="false">Quiz</button>
+          </div>
+
           <div class="rv-layout">
-            <form class="rv-panel rv-form" id="rv-form" novalidate>
-              <div class="rv-rows" id="rv-rows"></div>
-              <div class="rv-actions">
-                <button type="submit" class="btn-primary" id="btn-salvar-rv">Salvar</button>
-                <button type="button" class="btn-ghost" id="btn-exportar-pdf" disabled>Exportar PDF</button>
-                <span class="rv-validation-msg" id="rv-validation-msg" hidden></span>
+            <div class="rv-panel-col">
+              <form class="rv-panel rv-form" id="rv-form" novalidate>
+                <div class="rv-rows" id="rv-rows"></div>
+                <div class="rv-actions">
+                  <button type="submit" class="btn-primary" id="btn-salvar-rv">Salvar</button>
+                  <span class="rv-validation-msg" id="rv-validation-msg" hidden></span>
+                </div>
+              </form>
+
+              <div class="rv-panel rv-quiz" id="rv-quiz" hidden>
+                <div class="rv-quiz-progress">
+                  <div class="rv-quiz-progress-bar">
+                    <div class="rv-quiz-progress-fill" id="rv-quiz-progress-fill"></div>
+                  </div>
+                  <span class="badge badge--neutral" id="rv-quiz-badge"></span>
+                </div>
+
+                <div class="rv-quiz-header">
+                  <span class="rv-icon" id="rv-quiz-icon"></span>
+                  <h2 id="rv-quiz-titulo"></h2>
+                </div>
+
+                <details class="rv-quiz-details" open>
+                  <summary>O que é isso?</summary>
+                  <p id="rv-quiz-definicao"></p>
+                </details>
+
+                <details class="rv-quiz-details">
+                  <summary>Perguntas de apoio</summary>
+                  <ul id="rv-quiz-perguntas"></ul>
+                </details>
+
+                <div class="rv-quiz-fields">
+                  <div class="rv-field">
+                    <span class="rv-field-label">Atual</span>
+                    <input type="number" min="0" max="10" step="1" class="rv-input" id="rv-quiz-atual" data-campo="atual" required>
+                  </div>
+                  <div class="rv-field">
+                    <span class="rv-field-label">Desejado</span>
+                    <input type="number" min="0" max="10" step="1" class="rv-input" id="rv-quiz-desejado" data-campo="desejado" required>
+                  </div>
+                </div>
+
+                <span class="rv-validation-msg" id="rv-quiz-validation-msg" hidden></span>
+
+                <div class="rv-quiz-nav">
+                  <button type="button" class="btn-ghost" id="rv-quiz-prev">← Anterior</button>
+                  <button type="button" class="btn-primary" id="rv-quiz-next">Próximo pilar →</button>
+                </div>
               </div>
-            </form>
+            </div>
 
             <div class="rv-side">
               <div class="rv-panel">
@@ -99,8 +147,11 @@
               </div>
 
               <div class="rv-panel rv-classificacao" id="rv-classificacao" hidden>
-                <span class="rv-classificacao-label" id="rv-classificacao-label"></span>
-                <span class="rv-classificacao-media" id="rv-classificacao-media"></span>
+                <div class="rv-classificacao-info">
+                  <span class="rv-classificacao-label" id="rv-classificacao-label"></span>
+                  <span class="rv-classificacao-media" id="rv-classificacao-media"></span>
+                </div>
+                <button type="button" class="btn-ghost" id="btn-exportar-pdf" disabled>Exportar PDF</button>
               </div>
             </div>
           </div>
@@ -123,6 +174,7 @@
       renderRadarSvgContent,
     } from '../js/sessoes.js?v=1';
     import { exportarRodaVidaPdf } from '../js/roda-vida-pdf.js?v=1';
+    import { CONTEUDO_PILARES } from '../js/roda-vida-conteudo.js?v=1';
 
     const params = new URLSearchParams(window.location.search);
     const sessaoId = params.get('sessao_id');
@@ -138,7 +190,23 @@
     const classificacaoLabelEl = document.getElementById('rv-classificacao-label');
     const classificacaoMediaEl = document.getElementById('rv-classificacao-media');
 
+    const gridFormEl = document.getElementById('rv-form');
+    const quizEl = document.getElementById('rv-quiz');
+    const quizValidationMsgEl = document.getElementById('rv-quiz-validation-msg');
+    const quizPrevBtn = document.getElementById('rv-quiz-prev');
+    const quizNextBtn = document.getElementById('rv-quiz-next');
+    const quizAtualInput = document.getElementById('rv-quiz-atual');
+    const quizDesejadoInput = document.getElementById('rv-quiz-desejado');
+
     let ultimaAvaliacaoSalva = null;
+    let quizIndex = 0;
+
+    // Estado central de valores — compartilhado pelos dois modos (grade e
+    // quiz), garantindo que alternar a aba nunca perca o que já foi digitado.
+    const valores = {};
+    for (const { key } of AREAS_RODA_VIDA) {
+      valores[key] = { atual: null, desejado: null };
+    }
 
     function escapeHtml(str) {
       const div = document.createElement('div');
@@ -161,31 +229,18 @@
             <span class="rv-label">${area.label}</span>
             <div class="rv-field">
               <span class="rv-field-label">Atual</span>
-              <input type="number" min="0" max="10" step="1" class="rv-input" data-key="${area.key}" data-campo="atual" required>
+              <input type="number" min="0" max="10" step="1" class="rv-input" data-key="${area.key}" data-campo="atual" required value="${valores[area.key].atual ?? ''}">
             </div>
             <div class="rv-field">
               <span class="rv-field-label">Desejado</span>
-              <input type="number" min="0" max="10" step="1" class="rv-input" data-key="${area.key}" data-campo="desejado" required>
+              <input type="number" min="0" max="10" step="1" class="rv-input" data-key="${area.key}" data-campo="desejado" required value="${valores[area.key].desejado ?? ''}">
             </div>
           </div>
         `
       ).join('');
     }
 
-    function lerValores() {
-      const valores = {};
-      for (const { key } of AREAS_RODA_VIDA) {
-        const atualInput = rowsEl.querySelector(`input[data-key="${key}"][data-campo="atual"]`);
-        const desejadoInput = rowsEl.querySelector(`input[data-key="${key}"][data-campo="desejado"]`);
-        valores[key] = {
-          atual: atualInput.value === '' ? null : Number(atualInput.value),
-          desejado: desejadoInput.value === '' ? null : Number(desejadoInput.value),
-        };
-      }
-      return valores;
-    }
-
-    function validarFormulario(valores) {
+    function validarFormularioGrade() {
       let valido = true;
       for (const { key } of AREAS_RODA_VIDA) {
         for (const campo of ['atual', 'desejado']) {
@@ -198,8 +253,96 @@
       return valido;
     }
 
+    function validarTodosPilares() {
+      return AREAS_RODA_VIDA.every(
+        ({ key }) => isNotaValida(valores[key].atual) && isNotaValida(valores[key].desejado)
+      );
+    }
+
     function atualizarRadar() {
-      radarEl.innerHTML = renderRadarSvgContent(lerValores());
+      radarEl.innerHTML = renderRadarSvgContent(valores);
+    }
+
+    // ── Modo Quiz ──────────────────────────────────────────────────
+    function pilarAtual() {
+      return AREAS_RODA_VIDA[quizIndex];
+    }
+
+    function renderPilarAtual() {
+      const area = pilarAtual();
+      const conteudo = CONTEUDO_PILARES[area.key];
+
+      document.getElementById('rv-quiz-icon').innerHTML = `<svg viewBox="0 0 24 24">${area.icon}</svg>`;
+      document.getElementById('rv-quiz-titulo').textContent = area.label;
+      document.getElementById('rv-quiz-badge').textContent = `Pilar ${quizIndex + 1} de ${AREAS_RODA_VIDA.length}`;
+      document.getElementById('rv-quiz-definicao').textContent = conteudo?.definicao ?? '';
+      document.getElementById('rv-quiz-perguntas').innerHTML = (conteudo?.perguntas ?? [])
+        .map((pergunta) => `<li>${escapeHtml(pergunta)}</li>`)
+        .join('');
+
+      quizAtualInput.value = valores[area.key].atual ?? '';
+      quizDesejadoInput.value = valores[area.key].desejado ?? '';
+      quizAtualInput.classList.remove('invalid');
+      quizDesejadoInput.classList.remove('invalid');
+
+      quizPrevBtn.disabled = quizIndex === 0;
+      quizNextBtn.textContent = quizIndex === AREAS_RODA_VIDA.length - 1 ? 'Finalizar' : 'Próximo pilar →';
+
+      document.getElementById('rv-quiz-progress-fill').style.width =
+        `${((quizIndex + 1) / AREAS_RODA_VIDA.length) * 100}%`;
+
+      quizValidationMsgEl.hidden = true;
+    }
+
+    async function finalizarQuiz() {
+      if (!validarTodosPilares()) {
+        const idxInvalido = AREAS_RODA_VIDA.findIndex(
+          ({ key }) => !isNotaValida(valores[key].atual) || !isNotaValida(valores[key].desejado)
+        );
+        if (idxInvalido !== -1) {
+          quizIndex = idxInvalido;
+          renderPilarAtual();
+        }
+        quizValidationMsgEl.textContent = 'Preencha todos os pilares com valores inteiros de 0 a 10.';
+        quizValidationMsgEl.hidden = false;
+        return;
+      }
+      quizValidationMsgEl.hidden = true;
+      quizNextBtn.disabled = true;
+      quizNextBtn.textContent = 'Salvando…';
+      try {
+        await salvarNoBanco();
+      } catch (err) {
+        quizValidationMsgEl.textContent = 'Erro ao salvar. Tente novamente.';
+        quizValidationMsgEl.hidden = false;
+      } finally {
+        quizNextBtn.disabled = false;
+        quizNextBtn.textContent = 'Finalizar';
+      }
+    }
+
+    async function salvarNoBanco() {
+      const avaliacaoSalva = await salvarAvaliacaoRodaVida(sessaoId, valores);
+      ultimaAvaliacaoSalva = avaliacaoSalva;
+      exibirClassificacao(avaliacaoSalva);
+      return avaliacaoSalva;
+    }
+
+    // ── Toggle de modo (Resposta Rápida / Quiz) ─────────────────────
+    function setModo(modo) {
+      const isQuiz = modo === 'quiz';
+      gridFormEl.hidden = isQuiz;
+      quizEl.hidden = !isQuiz;
+      document.querySelectorAll('.rv-mode-btn').forEach((btn) => {
+        const ativo = btn.dataset.mode === modo;
+        btn.classList.toggle('is-active', ativo);
+        btn.setAttribute('aria-selected', String(ativo));
+      });
+      if (isQuiz) {
+        renderPilarAtual();
+      } else {
+        montarLinhasFormulario();
+      }
     }
 
     function exibirClassificacao(avaliacao) {
@@ -216,13 +359,11 @@
       btnExportar.disabled = false;
     }
 
-    function preencherFormulario(avaliacao) {
+    function preencherValores(avaliacao) {
       if (!avaliacao) return;
       for (const { key } of AREAS_RODA_VIDA) {
-        const atualInput = rowsEl.querySelector(`input[data-key="${key}"][data-campo="atual"]`);
-        const desejadoInput = rowsEl.querySelector(`input[data-key="${key}"][data-campo="desejado"]`);
-        atualInput.value = avaliacao[`atual_${key}`];
-        desejadoInput.value = avaliacao[`desejado_${key}`];
+        valores[key].atual = avaliacao[`atual_${key}`];
+        valores[key].desejado = avaliacao[`desejado_${key}`];
       }
     }
 
@@ -249,8 +390,48 @@
       montarLinhasFormulario();
       atualizarRadar();
 
-      rowsEl.addEventListener('input', () => {
+      rowsEl.addEventListener('input', (event) => {
+        const input = event.target;
+        if (!input.matches('input[data-key][data-campo]')) return;
+        const { key, campo } = input.dataset;
+        valores[key][campo] = input.value === '' ? null : Number(input.value);
         atualizarRadar();
+      });
+
+      quizEl.addEventListener('input', (event) => {
+        const input = event.target;
+        if (!input.matches('input[data-campo]')) return;
+        const area = pilarAtual();
+        valores[area.key][input.dataset.campo] = input.value === '' ? null : Number(input.value);
+        atualizarRadar();
+      });
+
+      document.querySelectorAll('.rv-mode-btn').forEach((btn) => {
+        btn.addEventListener('click', () => setModo(btn.dataset.mode));
+      });
+
+      quizPrevBtn.addEventListener('click', () => {
+        if (quizIndex === 0) return;
+        quizIndex -= 1;
+        renderPilarAtual();
+      });
+
+      quizNextBtn.addEventListener('click', async () => {
+        const area = pilarAtual();
+        const ok = isNotaValida(valores[area.key].atual) && isNotaValida(valores[area.key].desejado);
+        if (!ok) {
+          quizAtualInput.classList.toggle('invalid', !isNotaValida(valores[area.key].atual));
+          quizDesejadoInput.classList.toggle('invalid', !isNotaValida(valores[area.key].desejado));
+          quizValidationMsgEl.textContent = 'Preencha as duas notas (0 a 10) antes de continuar.';
+          quizValidationMsgEl.hidden = false;
+          return;
+        }
+        if (quizIndex === AREAS_RODA_VIDA.length - 1) {
+          await finalizarQuiz();
+          return;
+        }
+        quizIndex += 1;
+        renderPilarAtual();
       });
 
       let sessao;
@@ -280,16 +461,16 @@
 
       const avaliacaoExistente = await getAvaliacaoRodaVida(sessaoId).catch(() => null);
       if (avaliacaoExistente) {
-        preencherFormulario(avaliacaoExistente);
+        preencherValores(avaliacaoExistente);
+        montarLinhasFormulario();
         atualizarRadar();
         ultimaAvaliacaoSalva = avaliacaoExistente;
         exibirClassificacao(avaliacaoExistente);
       }
 
-      document.getElementById('rv-form').addEventListener('submit', async (event) => {
+      gridFormEl.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const valores = lerValores();
-        const valido = validarFormulario(valores);
+        const valido = validarFormularioGrade();
         if (!valido) {
           validationMsgEl.textContent = 'Preencha todos os campos com valores inteiros de 0 a 10.';
           validationMsgEl.hidden = false;
@@ -300,9 +481,7 @@
         btnSalvar.disabled = true;
         btnSalvar.textContent = 'Salvando…';
         try {
-          const avaliacaoSalva = await salvarAvaliacaoRodaVida(sessaoId, valores);
-          ultimaAvaliacaoSalva = avaliacaoSalva;
-          exibirClassificacao(avaliacaoSalva);
+          await salvarNoBanco();
         } catch (err) {
           validationMsgEl.textContent = 'Erro ao salvar. Tente novamente.';
           validationMsgEl.hidden = false;
@@ -320,7 +499,7 @@
           await exportarRodaVidaPdf({
             coacheeNome: coachee?.nome_casual || 'Coachee',
             sessaoData: formatarData(sessao.data),
-            valores: lerValores(),
+            valores,
             media: ultimaAvaliacaoSalva.media_atual,
             classificacao: ultimaAvaliacaoSalva.classificacao,
             radarEl,
